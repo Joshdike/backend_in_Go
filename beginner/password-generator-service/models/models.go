@@ -9,4 +9,5 @@ type PasswordRequest struct {
 
 type PasswordResponse struct {
 	Password string `json:"password"`
+	Strength string `json:"strength"`
 }

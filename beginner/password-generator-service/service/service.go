@@ -4,11 +4,12 @@ import (
 	"crypto/rand"
 	"errors"
 	"math/big"
+	"strings"
 )
 
-func GeneratePassword(length int, includeUppercase, includeNumbers, includeSpecial bool) (string, error) {
+func GeneratePassword(length int, includeUppercase, includeNumbers, includeSpecial bool) (string, string, error) {
 	if length < 4 || length > 32 {
-		return "", errors.New("requested password length must be from 4 to 32 characters")
+		return "", "", errors.New("requested password length must be from 4 to 32 characters")
 	}
 	lowercase := "abcdefghijklmnopqrstuvwxyz"
 	uppercase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -34,7 +35,7 @@ func GeneratePassword(length int, includeUppercase, includeNumbers, includeSpeci
 	for i, charPool := range requiredPools {
 		n, err := randomElement(charPool)
 		if err != nil {
-			return "", errors.New(err.Error())
+			return "", "", errors.New(err.Error())
 		}
 		password[i] = n
 	}
@@ -43,17 +44,17 @@ func GeneratePassword(length int, includeUppercase, includeNumbers, includeSpeci
 	for i := len(requiredPools); i < length; i++ {
 		n, err := randomElement(poolBytes)
 		if err != nil {
-			return "", errors.New(err.Error())
+			return "", "", errors.New(err.Error())
 		}
 		password[i] = n
 	}
 
 	err := shuffle(password)
 	if err != nil {
-		return "", errors.New(err.Error())
+		return "", "", errors.New(err.Error())
 	}
 
-	return string(password), nil
+	return string(password), passwordStrength(password), nil
 }
 
 func randomElement(pool []byte) (byte, error) {
@@ -75,11 +76,43 @@ func shuffle(a []byte) error {
 	return nil
 }
 
-// func containsAny(char []byte, word string) bool {
-// 	for _, i := range char {
-// 		if strings.ContainsRune(word, rune(i)) {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+func passwordStrength(password []byte) string {
+	strength := 0
+	lowercase := "abcdefghijklmnopqrstuvwxyz"
+	uppercase := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	numbers := "0123456789"
+	special := "!@#$%^&*()-_=+[]{}|;:,.<>?/"
+	if len(password) >= 8 {
+		strength += 2
+	}
+	if containsAny(password, lowercase) {
+		strength += 1
+	}
+	if containsAny(password, uppercase) {
+		strength += 1
+	}
+	if containsAny(password, numbers) {
+		strength += 1
+	}
+	if containsAny(password, special) {
+		strength += 1
+	}
+	if strength == 6 {
+		return "very strong"
+	} else if strength == 5 {
+		return "strong"
+	} else if strength >= 3 {
+		return "medium"
+	} else {
+		return "weak"
+	}
+}
+
+func containsAny(char []byte, word string) bool {
+	for _, i := range char {
+		if strings.ContainsRune(word, rune(i)) {
+			return true
+		}
+	}
+	return false
+}
