@@ -15,13 +15,13 @@ func GeneratePassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"invalid request body"}`, http.StatusBadRequest)
 		return
 	}
-	resp, err := service.GeneratePassword(req.Length, req.IncludeUppercase, req.IncludeNumbers, req.IncludeSpecial)
+	resp, strength, err := service.GeneratePassword(req.Length, req.IncludeUppercase, req.IncludeNumbers, req.IncludeSpecial)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-	if err := json.NewEncoder(w).Encode(models.PasswordResponse{Password: resp}); err != nil {
+	if err := json.NewEncoder(w).Encode(models.PasswordResponse{Password: resp, Strength: strength}); err != nil {
 		http.Error(w, `{"error":"unable to encode response"}`, http.StatusInternalServerError)
 	}
 }
