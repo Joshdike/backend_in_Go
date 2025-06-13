@@ -40,7 +40,7 @@ func main() {
 	r.Delete("/task/{id}", h.DeleteTask)
 
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
-
+	fmt.Printf("server starting on port %s...", port)
 	if err := http.ListenAndServe(port, r); err != nil {
 		log.Fatal(err)
 	}
