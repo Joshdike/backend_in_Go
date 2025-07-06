@@ -6,7 +6,9 @@ import (
 	"github.com/Joshdike/backend_in_Go/beginner/weather-api/models"
 )
 
-var cache = make(map[string]CacheItem)
+var (
+	cache = make(map[string]CacheItem)
+)
 
 type CacheItem struct {
 	weather models.WeatherResponse
@@ -25,6 +27,13 @@ func GetCache(city string) models.WeatherResponse {
 }
 
 func IsCached(city string) bool {
-	_, ok := cache[city]
-	return ok
+	item, ok := cache[city]
+	if !ok {
+		return false
+	}
+	if item.Expiry < time.Now().Unix() {
+		delete(cache, city)
+		return false
+	}
+	return true
 }

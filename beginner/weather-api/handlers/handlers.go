@@ -22,23 +22,72 @@ func GetWeather(w http.ResponseWriter, r *http.Request) {
 	}
 	var weather models.WeatherResponse
 
-	if (longitude == "" && latitude == "") || !isValidPosition(longitude, latitude) {
+	if !isValidPosition(longitude, latitude) {
+		if location == "" {
+			http.Error(w, `{"error":"invalid longitude or latitude"}`, http.StatusBadRequest)
+			return
+		}
+		if utils.IsCached(location) {
+			weather = utils.GetCache(location)
+			err := json.NewEncoder(w).Encode(weather)
+			if err != nil {
+				http.Error(w, `{"error":"failed to encode JSON response"}`, http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+
+		latitude, longitude, err := service.GetCoordinates(location)
+		if err != nil {
+			http.Error(w, `{"error":"could not get coordinates", "error": "`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+
+		data, err := service.GetWeather(latitude, longitude)
+		if err != nil {
+			http.Error(w, `{"error":"could not get weather"}`, http.StatusInternalServerError)
+			return
+		}
+		weather = models.WeatherResponse{
+			City:        location,
+			Temp:        data.CurrentWeather.Temperature,
+			Windspeed:   data.CurrentWeather.Windspeed,
+			Description: GetDescription(data.CurrentWeather.Weathercode),
+		}
+		utils.SetCache(location, weather)
+		err = json.NewEncoder(w).Encode(weather)
+		if err != nil {
+			http.Error(w, `{"error":"failed to encode JSON response"}`, http.StatusInternalServerError)
+			return
+		}
+		return
+	}
+
+	city, err := service.GetCity(latitude, longitude)
+	if err != nil {
+		http.Error(w, `{"error":"could not get city", "error": "`+err.Error()+`"}`, http.StatusInternalServerError)
+		return
+	}
+
+	if utils.IsCached(city) {
+		weather = utils.GetCache(city)
+		err = json.NewEncoder(w).Encode(weather)
+		if err != nil {
+			http.Error(w, `{"error":"failed to encode JSON response"}`, http.StatusInternalServerError)
+			return
+		}
+		return
 	}
 
 	data, err := service.GetWeather(latitude, longitude)
 	if err != nil {
-		http.Error(w, `{"error":"could not get weather"}`, http.StatusInternalServerError)
-		return
-	}
-	city, err := service.GetCity(latitude, longitude)
-	if err != nil {
-		http.Error(w, `{"error":"could not get city"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error":"could not get weather", "error": "`+err.Error()+`"}`, http.StatusInternalServerError)
 		return
 	}
 	weather = models.WeatherResponse{
-		City: city,
-		Temp: data.CurrentWeather.Temperature,
-		Windspeed: data.CurrentWeather.Windspeed,
+		City:        city,
+		Temp:        data.CurrentWeather.Temperature,
+		Windspeed:   data.CurrentWeather.Windspeed,
 		Description: GetDescription(data.CurrentWeather.Weathercode),
 	}
 	utils.SetCache(city, weather)

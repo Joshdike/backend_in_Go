@@ -19,12 +19,47 @@ type WeatherData struct {
 	CurrentWeather CurrentWeather `json:"current_weather"`
 }
 
-type Location struct {
-	Lat         string `json:"lat"`
-	Lon         string `json:"lon"`
-	DisplayName string `json:"display_name"`
+type Location []struct {
+	PlaceID     int      `json:"place_id"`
+	Licence     string   `json:"licence"`
+	OsmType     string   `json:"osm_type"`
+	OsmID       int      `json:"osm_id"`
+	Lat         string   `json:"lat"`
+	Lon         string   `json:"lon"`
+	Class       string   `json:"class"`
+	Type        string   `json:"type"`
+	PlaceRank   int      `json:"place_rank"`
+	Importance  float64  `json:"importance"`
+	AddressType string   `json:"addresstype"`
+	Name        string   `json:"name"`
+	DisplayName string   `json:"display_name"`
+	BoundingBox []string `json:"boundingbox"`
+}
+
+type CityResponse struct {
+	PlaceID     int     `json:"place_id"`
+	Licence     string  `json:"licence"`
+	OsmType     string  `json:"osm_type"`
+	OsmID       int     `json:"osm_id"`
+	Lat         string  `json:"lat"`
+	Lon         string  `json:"lon"`
+	Class       string  `json:"class"`
+	Type        string  `json:"type"`
+	PlaceRank   int     `json:"place_rank"`
+	Importance  float64 `json:"importance"`
+	AddressType string  `json:"addresstype"`
+	Name        string  `json:"name"`
+	DisplayName string  `json:"display_name"`
 	Address     struct {
-		City    string `json:"city"`
-		Country string `json:"country"`
+		Road         string `json:"road"`
+		Hamlet       string `json:"hamlet"`
+		Municipality string `json:"municipality"`
+		County       string `json:"county"`
+		State        string `json:"state"`
+		ISO3166Lvl4  string `json:"ISO3166-2-lvl4"`
+		Region       string `json:"region"`
+		Country      string `json:"country"`
+		CountryCode  string `json:"country_code"`
 	} `json:"address"`
+	BoundingBox []string `json:"boundingbox"`
 }
