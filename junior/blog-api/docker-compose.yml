@@ -1,6 +1,6 @@
 services:
   database:
-    container_name: blog
+    container_name: blog_api
     image: postgres
     restart: always
     environment:
