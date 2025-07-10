@@ -45,6 +45,15 @@ func (h handle) Register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error":"password must be at least 8 characters"}`, http.StatusBadRequest)
 		return
 	}
+	exists, err := h.userRepo.UsernameExists(req.Username)
+	if err != nil {
+		http.Error(w, `{"error":"system error checking username"}`, http.StatusInternalServerError)
+		return
+	}
+	if exists {
+		http.Error(w, `{"error":"username already exists"}`, http.StatusBadRequest)
+		return
+	}
 
 	user := &models.User{
 		Username: req.Username,

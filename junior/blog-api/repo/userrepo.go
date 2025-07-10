@@ -40,3 +40,17 @@ func (r *UserRepo) FindByUsername(username string) (*models.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepo) UsernameExists(username string) (bool, error) {
+	var exists bool
+	query := `
+		SELECT EXISTS (
+			SELECT 1
+			FROM users
+			WHERE username = $1
+		)
+	`
+	err := r.db.QueryRow(context.Background(), query, username).Scan(&exists)
+
+	return exists, err
+}

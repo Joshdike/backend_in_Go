@@ -39,7 +39,7 @@ func main() {
 	r.Get("/posts/{postId}", h.GetPostByID)
 	r.Get("/posts?user_id={userId}", h.GetPostsByUserId)
 	r.Get("/posts/{postId}/comments", h.GetComments)
-	r.Get("/posts/{postId}/comments/{commentId}", h.GetComment)
+	r.Get("/comments/{commentId}", h.GetComment)
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.JWTMiddleware(os.Getenv("JWT_SECRET")))
@@ -48,7 +48,7 @@ func main() {
 		r.Put("/posts/{postId}", h.UpdatePost)
 		r.Delete("/posts/{postId}", h.DeletePost)
 		r.Post("/posts/{postId}/comments", h.CreateComment)
-		r.Delete("/posts/{postId}/comments/{commentId}", h.DeleteComment)
+		r.Delete("/comments/{commentId}", h.DeleteComment)
 	})
 
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
