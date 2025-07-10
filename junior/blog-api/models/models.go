@@ -47,12 +47,11 @@ type Comment struct {
 }
 
 type PostRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title   string `json:"title" validate:"required,min=3,max=100"`
+	Content string `json:"content" validate:"required,min=10"`
 }
 
 type CommentRequest struct {
-	AuthorID int    `json:"author_id"`
 	Body     string `json:"body"`
 }
 

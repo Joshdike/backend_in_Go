@@ -67,10 +67,7 @@ func (h handle) Register(w http.ResponseWriter, r *http.Request) {
 
 func (h handle) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var creds struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
+	var creds models.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
 		http.Error(w, `{"error":"invalid request body"}`, http.StatusBadRequest)
 		return

@@ -37,7 +37,7 @@ func main() {
 	r.Post("/login", h.Login)
 	r.Get("/posts", h.GetAllPosts)
 	r.Get("/posts/{postId}", h.GetPostByID)
-	r.Get("/posts/users/{userId}", h.GetPostsByUserId)
+	r.Get("/posts?user_id={userId}", h.GetPostsByUserId)
 	r.Get("/posts/{postId}/comments", h.GetComments)
 	r.Get("/posts/{postId}/comments/{commentId}", h.GetComment)
 
